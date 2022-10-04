@@ -4,3 +4,4 @@ config.py
 venv/
 data/*.db
 data/*.sqlite
+.vscode/
