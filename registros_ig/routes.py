@@ -1,8 +1,10 @@
-from flask import jsonify, render_template
+from email.policy import HTTP
+from flask import jsonify, render_template, request
 import sqlite3
+from http import HTTPStatus
 
 from registros_ig import app
-from registros_ig.models import select_all
+from registros_ig.models import select_all, insert
 
 @app.route("/")
 def index():
@@ -31,7 +33,20 @@ def all_movements():
 
 @app.route("/api/v1.0/new", methods=["POST"])
 def new():
-    return "Esto hara un alta"
+    registro = request.json
+    # Validar registro, nos falta
+    try: 
+        insert([registro["date"], registro["concept"], registro["quantity"]])
+        return jsonify({
+            "status": "OK"
+        }), HTTPStatus.CREATED
+    except sqlite3.Error as e:
+        return jsonify({
+            "status": "Error",
+            "data": str(e)
+        }), HTTPStatus.BAD_REQUEST
+
+
 
 @app.route("/api/v1.0/delete/<int:id>", methods=["DELETE"])
 def delete(id):
